@@ -1,26 +1,35 @@
 #!/usr/bin/env bash
 
-PROJ_ROOT=/home/tyler/Desktop/codes/REMIND
+PROJ_ROOT=/home/mbt10/REMIND
 
 export PYTHONPATH=${PROJ_ROOT}
-source activate remind_proj
+
 cd ${PROJ_ROOT}/image_classification_experiments
 
-IMAGE_DIR=/media/tyler/nvme_drive/data/ImageNet2012
-EXPT_NAME=remind_imagenet
-GPU=0
+IMAGE_DIR=/n/groups/kreiman/shared_data/Imagenet2012
+EXPT_NAME=remind_squeezenet_imagenet
+GPU="${1:-0}" # Default 0, include alternative GPU index as 1st argument to this script
 
 REPLAY_SAMPLES=50
-MAX_BUFFER_SIZE=959665
+#MAX_BUFFER_SIZE=959665
+#MAX_BUFFER_SIZE=95966
+MAX_BUFFER_SIZE=278246
 CODEBOOK_SIZE=256
 NUM_CODEBOOKS=32
 BASE_INIT_CLASSES=100
 CLASS_INCREMENT=100
+#CLASS_INCREMENT=2
 NUM_CLASSES=1000
-BASE_INIT_CKPT=./imagenet_files/best_ResNet18ClassifyAfterLayer4_1_100.pth # base init ckpt file
+#NUM_CLASSES=104
+BASE_INIT_CKPT=./resnet_imagenet_ckpts/SqueezeNetClassifyAfterLayer12_100.pth # base init ckpt file
 LABEL_ORDER_DIR=./imagenet_files/ # location of numpy label files
 
 CUDA_VISIBLE_DEVICES=${GPU} python -u imagenet_experiment.py \
+--extract_features_from "model.features.12" \
+--base_arch "SqueezeNetClassifyAfterLayer12" \
+--classifier "SqueezeNetStartAfterLayer12" \
+--spatial_feat_dim 13 \
+--classifier_ckpt ${BASE_INIT_CKPT} \
 --images_dir ${IMAGE_DIR} \
 --max_buffer_size ${MAX_BUFFER_SIZE} \
 --num_classes ${NUM_CLASSES} \
@@ -28,12 +37,10 @@ CUDA_VISIBLE_DEVICES=${GPU} python -u imagenet_experiment.py \
 --streaming_max_class ${NUM_CLASSES} \
 --base_init_classes ${BASE_INIT_CLASSES} \
 --class_increment ${CLASS_INCREMENT} \
---classifier ResNet18_StartAt_Layer4_1 \
---classifier_ckpt ${BASE_INIT_CKPT} \
 --rehearsal_samples ${REPLAY_SAMPLES} \
---start_lr 0.1 \
+--start_lr 0.001 \
 --end_lr 0.001 \
---lr_step_size 100 \
+--lr_step_size 0 \
 --lr_mode step_lr_per_class \
 --weight_decay 1e-5 \
 --use_random_resized_crops \

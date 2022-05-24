@@ -19,31 +19,53 @@ def extract_features(model, data_loader, data_len, num_channels=512, spatial_fea
     :return: numpy arrays of features, labels, item_ixs
     """
 
+    print("Inside the extract_features function - transferring model to cuda:")
+
     model.eval()
     model.cuda()
 
+    print("Successfully transferred model to cuda. Allocating space for features and labels:")
+
     # allocate space for features and labels
-    features_data = np.empty((data_len, num_channels, spatial_feat_dim, spatial_feat_dim), dtype=np.float32)
+    # features_data = np.empty((data_len, num_channels, spatial_feat_dim, spatial_feat_dim), dtype=np.float32)
+    features_data = np.empty((data_len, spatial_feat_dim, spatial_feat_dim, num_channels), dtype=np.float32)
     labels_data = np.empty((data_len, 1), dtype=np.int)
     item_ixs_data = np.empty((data_len, 1), dtype=np.int)
+    print("Space successfully allocated for features and labels")
 
     # put features and labels into arrays
     start_ix = 0
     for batch_ix, (batch_x, batch_y, batch_item_ixs) in enumerate(data_loader):
-        batch_feats = model(batch_x.cuda())
+        # batch_feats = model(batch_x.cuda())
+        #print("Number of Nans in batch_x: " + str(np.count_nonzero(np.isnan(batch_x))))
+        #print("Shape of batch_x: " + str(batch_x.shape))
+        batch_feats = model(batch_x.cuda()).cpu().numpy()
         end_ix = start_ix + len(batch_feats)
-        features_data[start_ix:end_ix] = batch_feats.cpu().numpy()
+        #print("Shape of batch_feats: " + str(batch_feats.shape))
+        # features_data[start_ix:end_ix] = batch_feats.cpu().numpy()
+        #print("Number of Nans in batch_feats: " + str(np.count_nonzero(np.isnan(batch_feats))))
+        #print("Number of Infs in batch_feats: " + str(np.count_nonzero(np.isinf(batch_feats))))
+        #print("----------------------------------")
+        features_data[start_ix:end_ix] = np.copy(np.transpose(batch_feats, (0, 2, 3, 1)))
         labels_data[start_ix:end_ix] = np.atleast_2d(batch_y.numpy().astype(np.int)).transpose()
         item_ixs_data[start_ix:end_ix] = np.atleast_2d(batch_item_ixs.numpy().astype(np.int)).transpose()
         start_ix = end_ix
+        # if batch_ix % 10 == 0:
+        #     print("Batch: " + str(batch_ix))
+        #     print("Total size of features_data: " + str(features_data.nbytes/1000000) + " Mb")
+
+    print("Finished putting features and labels into arrays: extract_features succeeded")
     return features_data, labels_data, item_ixs_data
 
 
 def extract_base_init_features(imagenet_path, label_dir, extract_features_from, classifier_ckpt, arch,
-                               max_class, num_channels, spatial_feat_dim, batch_size=128):
-    core_model = build_classifier(arch, classifier_ckpt, num_classes=None)
+                               max_class, num_channels, spatial_feat_dim, batch_size=128, remind_model=None):
 
-    model = ModelWrapper(core_model, output_layer_names=[extract_features_from], return_single=True)
+    if "SqueezeNet" in arch:
+        model = remind_model.classifier_G
+    else:
+        core_model = build_classifier(arch, classifier_ckpt, num_classes=None)
+        model = ModelWrapper(core_model, output_layer_names=[extract_features_from], return_single=True)
 
     base_train_loader = utils_imagenet.get_imagenet_data_loader(imagenet_path + '/train', label_dir, split='train',
                                                                 batch_size=batch_size, shuffle=False, min_class=0,
@@ -74,9 +96,19 @@ def fit_pq(feats_base_init, labels_base_init, item_ix_base_init, num_channels, s
      and associated item_ixs)
     """
 
-    train_data_base_init = np.transpose(feats_base_init, (0, 2, 3, 1))
-    train_data_base_init = np.reshape(train_data_base_init, (-1, num_channels))
+    print("In fit_pq")
+    #train_data_base_init = np.transpose(feats_base_init, (0, 2, 3, 1))
+    # print('Transpose sharing memory:', np.shares_memory(feats_base_init, train_data_base_init))
+    # print("Size of train_data_base_init: " + str(train_data_base_init.nbytes/1000000) + " Mb")
+    # print("Shape of train_data_base_init: " + str(train_data_base_init.shape))
+    #train_data_base_init = np.reshape(train_data_base_init, (-1, num_channels))  # <-----WHODUNNIT
+    train_data_base_init = np.reshape(feats_base_init, (-1, num_channels))
+    print("Number of NaNs in train_data_base_init: " + str(np.count_nonzero(np.isnan(train_data_base_init))))
+    print("Number of Infs in train_data_base_init: " + str(np.count_nonzero(np.isinf(train_data_base_init))))
+    print('Reshape of transpose is a view: ', np.shares_memory(train_data_base_init, feats_base_init))
+    print("fit_pq 1")
     num_samples = len(train_data_base_init)
+    print("fit_pq 2")
 
     print('\nTraining Product Quantizer')
     start = time.time()

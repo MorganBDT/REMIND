@@ -5,6 +5,7 @@ import random
 import math
 import torch.utils.data
 from image_classification_experiments.resnet_models import *
+from image_classification_experiments.squeezenet_models import *
 
 
 class Counter:
@@ -81,8 +82,7 @@ def safe_load_dict(model, new_model_state, should_resume_all_params=False):
     c = 0
     if should_resume_all_params:
         for old_name, old_param in old_model_state.items():
-            assert old_name in list(new_model_state.keys()), "{} parameter is not present in resumed checkpoint".format(
-                old_name)
+            assert old_name in list(new_model_state.keys()), "{} parameter is not present in resumed checkpoint".format(old_name)
     for name, param in new_model_state.items():
         n = name.split('.')
         beg = n[0]
@@ -117,7 +117,7 @@ def build_classifier(classifier, classifier_ckpt, num_classes):
         else:
             state_dict_key = 'model_state'
         print("Resuming with {}".format(classifier_ckpt))
-        safe_load_dict(classifier, resumed[state_dict_key], should_resume_all_params=True)
+        safe_load_dict(classifier, resumed[state_dict_key], should_resume_all_params=False)
     return classifier
 
 

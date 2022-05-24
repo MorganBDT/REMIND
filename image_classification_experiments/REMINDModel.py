@@ -4,13 +4,15 @@ import numpy as np
 import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
+import torchvision.models as models
 import sys
 import random
 import os
 import faiss
 import pickle
 import image_classification_experiments.utils as utils
-from image_classification_experiments.retrieve_any_layer import ModelWrapper
+from image_classification_experiments.retrieve_any_layer import ModelWrapper, ModelWrapperSqueezeNetFeatExtractor
+from squeezenet_models import SqueezeNetStartAfterLayer12
 
 sys.setrecursionlimit(10000)
 
@@ -46,9 +48,20 @@ class REMINDModel(object):
                  use_random_resize_crops=True, max_buffer_size=None):
 
         # make the classifier
-        self.classifier_F = utils.build_classifier(classifier_F, classifier_ckpt, num_classes=num_classes)
-        core_model = utils.build_classifier(classifier_G, classifier_ckpt, num_classes=None)
-        self.classifier_G = ModelWrapper(core_model, output_layer_names=[extract_features_from], return_single=True)
+        if "SqueezeNet" in classifier_G:
+            core_model = models.squeezenet1_0(pretrained=False)
+            print("Squeezenet: loading pretrained model weights...")
+            state_dict = torch.load(classifier_ckpt, map_location=torch.device('cuda'))["state_dict"]
+            state_dict_within = {k.replace("model.", ""): state_dict[k] for k in state_dict.keys()}
+            core_model.load_state_dict(state_dict_within)
+            print("Squeezenet: loaded pretrained model successfully")
+            self.classifier_F = SqueezeNetStartAfterLayer12(core_model=core_model)
+            self.classifier_G = ModelWrapperSqueezeNetFeatExtractor(core_model, output_layer_names=[extract_features_from], return_single=True)
+            #self.classifier_G.load_state_dict(torch.load(classifier_ckpt, map_location=torch.device('cuda'))["state_dict"], strict=False)
+        else:
+            self.classifier_F = utils.build_classifier(classifier_F, classifier_ckpt, num_classes=num_classes)
+            core_model = utils.build_classifier(classifier_G, classifier_ckpt, num_classes=None)
+            self.classifier_G = ModelWrapper(core_model, output_layer_names=[extract_features_from], return_single=True)
 
         # make the optimizer
         trainable_params = self.get_trainable_params(self.classifier_F, start_lr)
@@ -80,7 +93,8 @@ class REMINDModel(object):
         self.num_codebooks = num_codebooks
         self.codebook_size = codebook_size
         self.use_random_resize_crops = use_random_resize_crops
-        self.random_resize_crop = utils.RandomResizeCrop(7, scale=(2 / 7, 1.0))
+        #self.random_resize_crop = utils.RandomResizeCrop(7, scale=(2 / 7, 1.0))
+        self.random_resize_crop = utils.RandomResizeCrop(13, scale=(4 / 13, 1.0))
         self.max_buffer_size = max_buffer_size
 
     def get_trainable_params(self, classifier, start_lr):
@@ -113,19 +127,23 @@ class REMINDModel(object):
 
         criterion = nn.CrossEntropyLoss(reduction='none')
 
-        msg = '\rSample %d -- train_loss=%1.6f -- elapsed_time=%d secs'
+        msg = '\rSample %d -- train_loss=%1.6f -- elapsed_time=%d secs\n'
 
         start_time = time.time()
         total_loss = utils.CMA()
         c = 0
         for batch_images, batch_labels, batch_item_ixs in curr_loader:
 
+            print("In batch loop iteration " + str(c) + ". Classifying data batch: ")
             # get features from G and latent codes from PQ
             data_batch = classifier_G(batch_images.cuda()).cpu().numpy()
+            print("Data batch classified. Reshaping data batch:")
             data_batch = np.transpose(data_batch, (0, 2, 3, 1))
             data_batch = np.reshape(data_batch, (-1, self.num_channels))
+            print("Reshaped data batch. Computing codes:")
             codes = pq.compute_codes(data_batch)
             codes = np.reshape(codes, (-1, self.num_feats, self.num_feats, self.num_codebooks))
+            print("Finished computing codes. ")
 
             # train REMIND on one new sample at a time
             for x, y, item_ix in zip(codes, batch_labels, batch_item_ixs):

@@ -15,6 +15,7 @@ import torch.utils.data.distributed
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 from image_classification_experiments.resnet_models import *
+from image_classification_experiments.squeezenet_models import *
 import time
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
@@ -387,8 +388,13 @@ class AverageMeter(object):
 
 
 def adjust_learning_rate(optimizer, epoch, args):
-    """Sets the learning rate to the initial LR decayed by 10 every 15 epochs"""
-    lr = args.lr * (0.1 ** (epoch // 15))
+    if "SqueezeNet" in args.arch:
+        """Decay the learning rate linearly"""
+        lr = ((args.epochs - epoch) / args.epochs)*args.lr
+        print("New learning rate: " + str(lr))
+    else:
+        """Sets the learning rate to the initial LR decayed by 10 every 15 epochs"""
+        lr = args.lr * (0.1 ** (epoch // 15))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 

@@ -48,6 +48,24 @@ class ModelWrapper(nn.Module):
             return output_vals
 
 
+class ModelWrapperSqueezeNetFeatExtractor(nn.Module):
+    def __init__(self, model, output_layer_names, return_single=False):
+        super(ModelWrapperSqueezeNetFeatExtractor, self).__init__()
+        self.model = model
+        #########
+        self.FeatureExtractor = nn.Sequential(*(list(self.model.features)[:12]))
+        for param in self.FeatureExtractor.parameters():
+            param.requires_grad = False
+        #########
+        self.output_layer_names = output_layer_names
+        self.outputs = {}
+        self.return_single = return_single
+        #add_hooks(self.model, self.outputs, self.output_layer_names)
+
+    def forward(self, images):
+        return self.FeatureExtractor(images)
+
+
 def test_resnet18():
     output_layer_names = ['layer1.0.bn1', 'layer4.0', 'fc']
     in_tensor = torch.ones((2, 3, 224, 224))
