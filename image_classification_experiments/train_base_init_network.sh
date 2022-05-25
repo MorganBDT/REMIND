@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PROJ_ROOT=/home/morgan/projects/REMIND
+PROJ_ROOT=/home/mbt10/REMIND
 
 export PYTHONPATH=${PROJ_ROOT}
 cd ${PROJ_ROOT}/image_classification_experiments
