@@ -3,4 +3,6 @@
 logs/
 vqa_experiments/__pycache__
 snapshots
+image_classification_experiments/o2_results/
+image_classification_experiments/streaming_experiments/
 *__pycache__

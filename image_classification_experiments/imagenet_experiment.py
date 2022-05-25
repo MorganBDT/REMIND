@@ -157,7 +157,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_buffer_size', type=int, default=None)  # maximum number of samples in buffer
 
     # learning rate parameters
-    parser.add_argument('--lr_mode', type=str, choices=['step_lr_per_class'],
+    parser.add_argument('--lr_mode', type=str, choices=['step_lr_per_class', 'constant'],
                         default='step_lr_per_class')  # decay the lr per class
     parser.add_argument('--lr_step_size', type=int, default=100)
     parser.add_argument('--start_lr', type=float, default=0.1)  # starting lr for class
@@ -186,6 +186,8 @@ if __name__ == '__main__':
 
     if args.lr_mode == 'step_lr_per_class':
         args.lr_gamma = np.exp(args.lr_step_size * np.log(args.end_lr / args.start_lr) / 1300)
+    else: 
+        args.lr_gamma = 0
 
     print("Arguments {}".format(json.dumps(vars(args), indent=4, sort_keys=True)))
 

@@ -41,7 +41,7 @@ CUDA_VISIBLE_DEVICES=${GPU} python -u imagenet_experiment.py \
 --start_lr 0.001 \
 --end_lr 0.001 \
 --lr_step_size 0 \
---lr_mode step_lr_per_class \
+--lr_mode constant \
 --weight_decay 1e-5 \
 --use_random_resized_crops \
 --use_mixup \
