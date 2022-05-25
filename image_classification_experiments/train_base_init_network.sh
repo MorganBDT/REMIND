@@ -5,7 +5,7 @@ PROJ_ROOT=/home/mbt10/REMIND
 export PYTHONPATH=${PROJ_ROOT}
 cd ${PROJ_ROOT}/image_classification_experiments
 
-IMAGENET_DIR=/media/data/Datasets/ImageNet2012
+IMAGENET_DIR=/n/groups/kreiman/shared_data/Imagenet2012
 BASE_MAX_CLASS=100
 MODEL=SqueezeNetClassifyAfterLayer12
 CKPT_FILE=SqueezeNetClassifyAfterLayer12
