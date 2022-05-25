@@ -392,7 +392,7 @@ def adjust_learning_rate(optimizer, epoch, args):
         # """Decay the learning rate linearly"""
         # lr = ((args.epochs - epoch) / args.epochs)*args.lr
         # print("New learning rate: " + str(lr))
-        pass
+        lr = args.lr
     else:
         """Sets the learning rate to the initial LR decayed by 10 every 15 epochs"""
         lr = args.lr * (0.1 ** (epoch // 15))
