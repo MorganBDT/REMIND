@@ -389,9 +389,10 @@ class AverageMeter(object):
 
 def adjust_learning_rate(optimizer, epoch, args):
     if "SqueezeNet" in args.arch:
-        """Decay the learning rate linearly"""
-        lr = ((args.epochs - epoch) / args.epochs)*args.lr
-        print("New learning rate: " + str(lr))
+        # """Decay the learning rate linearly"""
+        # lr = ((args.epochs - epoch) / args.epochs)*args.lr
+        # print("New learning rate: " + str(lr))
+        pass
     else:
         """Sets the learning rate to the initial LR decayed by 10 every 15 epochs"""
         lr = args.lr * (0.1 ** (epoch // 15))

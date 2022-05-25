@@ -13,7 +13,7 @@ LABEL_ORDER_DIR=./imagenet_files/ # location of numpy label files
 GPU="${1:-0}" # Default 0, include alternative GPU index as 1st argument to this script
 
 CUDA_VISIBLE_DEVICES=${GPU} python -u train_base_init_network_from_scratch.py \
---lr 0.01 \
+--lr 0.001 \
 --arch ${MODEL} \
 --ckpt_file ${CKPT_FILE} \
 --data ${IMAGENET_DIR} \

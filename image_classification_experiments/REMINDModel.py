@@ -49,7 +49,7 @@ class REMINDModel(object):
 
         # make the classifier
         if "SqueezeNet" in classifier_G:
-            core_model = models.squeezenet1_0(pretrained=False)
+            core_model = models.squeezenet1_0(pretrained=True)
             print("Squeezenet: loading pretrained model weights...")
             state_dict = torch.load(classifier_ckpt, map_location=torch.device('cuda'))["state_dict"]
             state_dict_within = {k.replace("model.", ""): state_dict[k] for k in state_dict.keys()}

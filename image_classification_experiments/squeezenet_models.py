@@ -7,7 +7,7 @@ class SqueezeNetClassifyAfterLayer12(nn.Module):
     def __init__(self, num_classes=None):
         super(SqueezeNetClassifyAfterLayer12, self).__init__()
 
-        self.model = models.squeezenet1_0(pretrained=False)
+        self.model = models.squeezenet1_0(pretrained=True)
         if num_classes is not None:
             print("Changing output layer to contain {} classes".format(num_classes))
             self.model.classifier[1] = nn.Conv2d(512, num_classes, (3, 3), stride=(1, 1), padding=(1, 1))
@@ -21,7 +21,7 @@ class SqueezeNetStartAfterLayer12(nn.Module):
         super(SqueezeNetStartAfterLayer12, self).__init__()
 
         if core_model is None:
-            self.model = models.squeezenet1_0(pretrained=False)
+            self.model = models.squeezenet1_0(pretrained=True)
             print('Changing output layer to contain %d classes.' % num_classes)
             self.model.classifier[1] = nn.Conv2d(512, num_classes, (3, 3), stride=(1, 1), padding=(1, 1))
         else:
