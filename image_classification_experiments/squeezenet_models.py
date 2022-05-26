@@ -1,16 +1,20 @@
 import torchvision.models as models
 import torch.nn as nn
-import torch.nn.functional as F
 
 
 class SqueezeNetClassifyAfterLayer12(nn.Module):
-    def __init__(self, num_classes=None):
+    def __init__(self, num_classes=None, freeze_feat_extract=True):
         super(SqueezeNetClassifyAfterLayer12, self).__init__()
 
         self.model = models.squeezenet1_0(pretrained=True)
         if num_classes is not None:
             print("Changing output layer to contain {} classes".format(num_classes))
             self.model.classifier[1] = nn.Conv2d(512, num_classes, (3, 3), stride=(1, 1), padding=(1, 1))
+
+        if freeze_feat_extract:
+            feature_extractor = nn.Sequential(*(list(self.model.features)[:12]))
+            for param in feature_extractor.parameters():
+                param.requires_grad = False
 
     def forward(self, x):
         return self.model(x)

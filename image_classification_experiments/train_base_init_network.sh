@@ -14,6 +14,7 @@ GPU="${1:-0}" # Default 0, include alternative GPU index as 1st argument to this
 
 CUDA_VISIBLE_DEVICES=${GPU} python -u train_base_init_network_from_scratch.py \
 --lr 0.001 \
+--epochs 20 \
 --arch ${MODEL} \
 --ckpt_file ${CKPT_FILE} \
 --data ${IMAGENET_DIR} \

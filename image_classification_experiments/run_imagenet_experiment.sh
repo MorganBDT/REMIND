@@ -7,7 +7,7 @@ export PYTHONPATH=${PROJ_ROOT}
 cd ${PROJ_ROOT}/image_classification_experiments
 
 IMAGE_DIR=/n/groups/kreiman/shared_data/Imagenet2012
-EXPT_NAME=remind_squeezenet_imagenet_prepretrain
+EXPT_NAME=remind_squeezenet_imagenet_prepretrain_freezefe
 GPU="${1:-0}" # Default 0, include alternative GPU index as 1st argument to this script
 
 REPLAY_SAMPLES=50
