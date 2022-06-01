@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class SqueezeNetClassifyAfterLayer12(nn.Module):
-    def __init__(self, num_classes=None, freeze_feat_extract=True):
+    def __init__(self, num_classes=None, freeze_feat_extract=False):
         super(SqueezeNetClassifyAfterLayer12, self).__init__()
 
         self.model = models.squeezenet1_0(pretrained=True)

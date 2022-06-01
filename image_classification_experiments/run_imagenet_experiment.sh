@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+GPU="${1:-0}" # Default 0, include alternative GPU index as 1st argument to this script
+RUN="${2:-0}"
+
 PROJ_ROOT=/home/mbt10/REMIND
 
 export PYTHONPATH=${PROJ_ROOT}
@@ -8,11 +11,9 @@ cd ${PROJ_ROOT}/image_classification_experiments
 
 IMAGE_DIR=/n/groups/kreiman/shared_data/Imagenet2012
 EXPT_NAME=remind_squeezenet_imagenet_prepretrain_freezefe
-GPU="${1:-0}" # Default 0, include alternative GPU index as 1st argument to this script
 
 REPLAY_SAMPLES=50
 #MAX_BUFFER_SIZE=959665
-#MAX_BUFFER_SIZE=95966
 MAX_BUFFER_SIZE=278246
 CODEBOOK_SIZE=256
 NUM_CODEBOOKS=32
@@ -21,8 +22,8 @@ CLASS_INCREMENT=100
 #CLASS_INCREMENT=2
 NUM_CLASSES=1000
 #NUM_CLASSES=104
-BASE_INIT_CKPT=./resnet_imagenet_ckpts/best_SqueezeNetClassifyAfterLayer12_100.pth # base init ckpt file
-LABEL_ORDER_DIR=./imagenet_files/ # location of numpy label files
+BASE_INIT_CKPT=./resnet_imagenet_ckpts/best_SqueezeNetClassifyAfterLayer12_run${RUN}.pth # base init ckpt file
+LABEL_ORDER_DIR=./imagenet_files_run${RUN}/ # location of numpy label files
 
 CUDA_VISIBLE_DEVICES=${GPU} python -u imagenet_experiment.py \
 --extract_features_from "model.features.12" \
