@@ -12,7 +12,7 @@ for run in range(0, 10):
     filelists_files = [
         os.path.join(
             filelist_location,
-            "imagenet_task_filelists/class_iid/run0/stream/train_task_0"+str(run)+"_filelist.txt"
+            "imagenet_task_filelists/class_iid/run"+str(run)+"/stream/train_task_0"+str(t)+"_filelist.txt"
         ) for t in range(0, 10)
     ]
 
