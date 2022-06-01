@@ -14,4 +14,4 @@ module load cuda/10.1
 
 source activate /home/mbt10/.conda/envs/remind_proj
 
-./run_imagenet_experiment.sh 0
+./run_imagenet_experiment.sh 0 $RUN

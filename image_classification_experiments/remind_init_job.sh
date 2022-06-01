@@ -14,4 +14,4 @@ module load cuda/10.1
 
 source activate /home/mbt10/.conda/envs/remind_proj
 
-./train_base_init_network.sh 0
+./train_base_init_network.sh 0 $RUN
