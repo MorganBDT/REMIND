@@ -21,4 +21,4 @@ CUDA_VISIBLE_DEVICES=${GPU} python -u train_base_init_network_from_scratch.py \
 --ckpt_file ${CKPT_FILE} \
 --data ${IMAGENET_DIR} \
 --base_max_class ${BASE_MAX_CLASS} \
---labels_dir ${LABEL_ORDER_DIR} > logs/${MODEL}_${BASE_MAX_CLASS}_base_init.log
+--labels_dir ${LABEL_ORDER_DIR} > logs/${MODEL}_${BASE_MAX_CLASS}_base_init_run${RUN}.log
