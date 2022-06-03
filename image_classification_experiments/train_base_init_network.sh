@@ -11,7 +11,7 @@ cd ${PROJ_ROOT}/image_classification_experiments
 IMAGENET_DIR=/n/groups/kreiman/shared_data/Imagenet2012
 BASE_MAX_CLASS=100
 MODEL=SqueezeNetClassifyAfterLayer12
-CKPT_FILE=SqueezeNetClassifyAfterLayer12_run${RUN}
+CKPT_FILE=SqueezeNetClassifyAfterLayer12_base_init_run${RUN}
 LABEL_ORDER_DIR=./imagenet_files_run${RUN}/ # location of numpy label files
 
 CUDA_VISIBLE_DEVICES=${GPU} python -u train_base_init_network_from_scratch.py \
@@ -21,5 +21,4 @@ CUDA_VISIBLE_DEVICES=${GPU} python -u train_base_init_network_from_scratch.py \
 --ckpt_file ${CKPT_FILE} \
 --data ${IMAGENET_DIR} \
 --base_max_class ${BASE_MAX_CLASS} \
---labels_dir ${LABEL_ORDER_DIR} \
---ckpt_file ${MODEL}_${BASE_MAX_CLASS}.pth > logs/${MODEL}_${BASE_MAX_CLASS}_from_scratch.log
+--labels_dir ${LABEL_ORDER_DIR} > logs/${MODEL}_${BASE_MAX_CLASS}_base_init.log
