@@ -10,7 +10,7 @@ export PYTHONPATH=${PROJ_ROOT}
 cd ${PROJ_ROOT}/image_classification_experiments
 
 IMAGE_DIR=/n/groups/kreiman/shared_data/Imagenet2012
-EXPT_NAME=remind_squeezenet_imagenet_run${RUN}
+EXPT_NAME=remind_squeezenet_imagenet_origlrscheduler_run${RUN}
 
 REPLAY_SAMPLES=50
 #MAX_BUFFER_SIZE=959665
@@ -40,8 +40,8 @@ CUDA_VISIBLE_DEVICES=${GPU} python -u imagenet_experiment.py \
 --class_increment ${CLASS_INCREMENT} \
 --rehearsal_samples ${REPLAY_SAMPLES} \
 --start_lr 0.001 \
---end_lr 0.001 \
---lr_step_size 0 \
+--end_lr 0.00001 \
+--lr_step_size 100 \
 --lr_mode constant \
 --weight_decay 1e-5 \
 --use_random_resized_crops \
