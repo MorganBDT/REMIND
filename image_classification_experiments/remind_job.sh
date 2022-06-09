@@ -16,5 +16,3 @@ source activate /home/mbt10/.conda/envs/remind_proj
 
 ./run_imagenet_experiment.sh 0 $RUN
 
-rm streaming_experiments/remind_squeezenet_imagenet_run${RUN}/*.pth
-rm -rf streaming_experiments/remind_squeezenet_imagenet_run${RUN}/remind_model
