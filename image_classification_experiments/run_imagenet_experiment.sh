@@ -39,10 +39,10 @@ CUDA_VISIBLE_DEVICES=${GPU} python -u imagenet_experiment.py \
 --base_init_classes ${BASE_INIT_CLASSES} \
 --class_increment ${CLASS_INCREMENT} \
 --rehearsal_samples ${REPLAY_SAMPLES} \
---start_lr 0.001 \
---end_lr 0.00001 \
+--start_lr 0.01 \
+--end_lr 0.0001 \
 --lr_step_size 100 \
---lr_mode constant \
+--lr_mode step_lr_per_class \
 --weight_decay 1e-5 \
 --use_random_resized_crops \
 --use_mixup \
