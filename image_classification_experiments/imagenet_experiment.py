@@ -49,7 +49,7 @@ def update_accuracies(args, curr_max_class, remind, pq, accuracies):
 
     utils.save_accuracies(accuracies, min_class_trained=args.min_class, max_class_trained=curr_max_class,
                           save_path=args.save_dir)
-    utils.save_predictions(seen_probas, args.min_class, curr_max_class, args.save_dir)
+    #utils.save_predictions(seen_probas, args.min_class, curr_max_class, args.save_dir)
 
 
 def streaming(args, remind):
@@ -88,7 +88,7 @@ def streaming(args, remind):
         base_probas, base_top1, base_top5 = compute_accuracies(initial_test_loader, remind, pq)
 
         print('\nInitial Test: top1=%0.2f%% -- top5=%0.2f%%' % (base_top1, base_top5))
-        utils.save_predictions(base_probas, args.min_class, args.base_init_classes, args.save_dir)
+        #utils.save_predictions(base_probas, args.min_class, args.base_init_classes, args.save_dir)
         accuracies['base_classes_top1'].append(float(base_top1))
         accuracies['base_classes_top5'].append(float(base_top5))
         accuracies['seen_classes_top1'].append(float(base_top1))
@@ -110,8 +110,8 @@ def streaming(args, remind):
                                      counter=counter)
 
         # save remind model out
-        save_full_path = os.path.join(args.save_dir, 'remind_model/')
-        remind.save(max_class, save_full_path, rehearsal_ixs, latent_dict, class_id_to_item_ix_dict, pq)
+        #save_full_path = os.path.join(args.save_dir, 'remind_model/')
+        #remind.save(max_class, save_full_path, rehearsal_ixs, latent_dict, class_id_to_item_ix_dict, pq)
 
         # perform inference
         test_loader = get_data_loader(args.images_dir, args.label_dir, 'val', args.min_class, max_class,
